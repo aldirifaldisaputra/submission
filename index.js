@@ -49,11 +49,21 @@ app.post(
             });
             return;
         }
-        const contents = conversation.map(({role, text})=> ({
+
+        // Seeding/System Prompt untuk persona teman curhat
+        const systemInstruction = {
+            role: 'user',
+            parts: [{ text: "Mulai sekarang, kamu adalah seorang teman curhat yang sangat baik, suportif, dan empatik. Namamu adalah 'Asisten Curhat'. Jangan pernah menyebutkan bahwa kamu adalah sebuah AI atau model bahasa. Berikan tanggapan yang hangat, tidak menghakimi, dan fokus pada perasaan pengguna. Gunakan bahasa yang santai dan akrab." }]
+        };
+
+        // Gabungkan instruksi sistem dengan percakapan dari pengguna
+        const contents = [
+            systemInstruction,
+            ...conversation.map(({role, text})=> ({
             role,
             parts: [{text}]
-        }));
-
+        }))
+        ];
         try{
             const aiResponse = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
